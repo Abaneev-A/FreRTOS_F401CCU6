@@ -487,7 +487,7 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin : Btn_Pin */
   GPIO_InitStruct.Pin = Btn_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(Btn_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : LED1_Pin LED2_Pin LED3_Pin */
@@ -534,7 +534,8 @@ void StartLED1Task(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+	HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
+	osDelay(1000);
   }
   /* USER CODE END StartLED1Task */
 }
@@ -552,7 +553,8 @@ void StartLED2Task(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+	HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
+	osDelay(2000);
   }
   /* USER CODE END StartLED2Task */
 }
