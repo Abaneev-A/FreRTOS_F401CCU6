@@ -405,7 +405,7 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 0;
+  htim2.Init.Prescaler = 300;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim2.Init.Period = 4095;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -572,7 +572,12 @@ void StartReadBtnTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+	if (!HAL_GPIO_ReadPin(Btn_GPIO_Port, Btn_Pin))
+	{
+		osSemaphoreRelease(BtnSemHandle);
+
+	}
+	osDelay(200);
   }
   /* USER CODE END StartReadBtnTask */
 }
@@ -590,7 +595,11 @@ void StartLED3Task(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+	if (osSemaphoreAcquire(BtnSemHandle, osWaitForever) == osOK)
+	{
+		HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin);
+	}
+	 osDelay(100);
   }
   /* USER CODE END StartLED3Task */
 }
@@ -608,7 +617,9 @@ void StartADCTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+	  uint16_t adc_res = HAL_ADC_GetValue(&hadc1);
+	  __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_4,adc_res);
+	  osDelay(100);
   }
   /* USER CODE END StartADCTask */
 }
