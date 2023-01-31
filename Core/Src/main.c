@@ -569,13 +569,15 @@ void StartLED2Task(void *argument)
 void StartReadBtnTask(void *argument)
 {
   /* USER CODE BEGIN StartReadBtnTask */
+	QUEUE_t msg;
   /* Infinite loop */
   for(;;)
   {
 	if (!HAL_GPIO_ReadPin(Btn_GPIO_Port, Btn_Pin))
 	{
 		osSemaphoreRelease(BtnSemHandle);
-
+		strcpy(msg.Buf,"Btn Pressed\r\n\0");
+		osMessageQueuePut(UARTQueueHandle, &msg, 0, osWaitForever);
 	}
 	osDelay(200);
   }
@@ -634,10 +636,13 @@ void StartADCTask(void *argument)
 void StartUARTTask(void *argument)
 {
   /* USER CODE BEGIN StartUARTTask */
+  QUEUE_t msg;
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+	osMessageQueueGet(UARTQueueHandle, &msg, 0, osWaitForever);
+	HAL_UART_Transmit(&huart1, (uint8_t*)msg.Buf, strlen(msg.Buf), osWaitForever);
+	osDelay(1);
   }
   /* USER CODE END StartUARTTask */
 }
