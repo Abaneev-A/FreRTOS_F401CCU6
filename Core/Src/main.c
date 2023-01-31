@@ -355,10 +355,10 @@ static void MX_ADC1_Init(void)
   /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
   */
   hadc1.Instance = ADC1;
-  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV6;
   hadc1.Init.Resolution = ADC_RESOLUTION_12B;
   hadc1.Init.ScanConvMode = DISABLE;
-  hadc1.Init.ContinuousConvMode = ENABLE;
+  hadc1.Init.ContinuousConvMode = DISABLE;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
@@ -550,10 +550,13 @@ void StartLED1Task(void *argument)
 void StartLED2Task(void *argument)
 {
   /* USER CODE BEGIN StartLED2Task */
+	QUEUE_t msg;
   /* Infinite loop */
   for(;;)
   {
 	HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
+	strcpy(msg.Buf,"LED2 Blink\r\n\0");
+	osMessageQueuePut(UARTQueueHandle, &msg, 0, osWaitForever);
 	osDelay(2000);
   }
   /* USER CODE END StartLED2Task */
@@ -569,7 +572,7 @@ void StartLED2Task(void *argument)
 void StartReadBtnTask(void *argument)
 {
   /* USER CODE BEGIN StartReadBtnTask */
-	QUEUE_t msg;
+  QUEUE_t msg;
   /* Infinite loop */
   for(;;)
   {
@@ -616,11 +619,25 @@ void StartLED3Task(void *argument)
 void StartADCTask(void *argument)
 {
   /* USER CODE BEGIN StartADCTask */
+  QUEUE_t msg;
   /* Infinite loop */
   for(;;)
   {
+	  HAL_ADC_PollForConversion(&hadc1,100);
 	  uint16_t adc_res = HAL_ADC_GetValue(&hadc1);
 	  __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_4,adc_res);
+	  if (adc_res < 10)
+	  {
+	    strcpy(msg.Buf,"MIN ADC\r\n\0");
+	    osMessageQueuePut(UARTQueueHandle, &msg, 0, osWaitForever);
+	    osDelay(1000);
+	  }
+	  else if (adc_res > 4000)
+	  {
+	    strcpy(msg.Buf,"MAX ADC\r\n\0");
+	    osMessageQueuePut(UARTQueueHandle, &msg, 0, osWaitForever);
+	    osDelay(1000);
+	  }
 	  osDelay(100);
   }
   /* USER CODE END StartADCTask */
