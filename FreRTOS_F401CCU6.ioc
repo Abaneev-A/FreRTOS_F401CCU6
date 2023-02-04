@@ -1,7 +1,7 @@
 #MicroXplorer Configuration settings - do not modify
 ADC1.Channel-0\#ChannelRegularConversion=ADC_CHANNEL_5
 ADC1.ClockPrescaler=ADC_CLOCK_SYNC_PCLK_DIV6
-ADC1.ContinuousConvMode=DISABLE
+ADC1.ContinuousConvMode=ENABLE
 ADC1.IPParameters=Rank-0\#ChannelRegularConversion,master,Channel-0\#ChannelRegularConversion,SamplingTime-0\#ChannelRegularConversion,NbrOfConversionFlag,ContinuousConvMode,NbrOfConversion,InjNumberOfConversion,ScanConvMode,ClockPrescaler
 ADC1.InjNumberOfConversion=0
 ADC1.NbrOfConversion=1
@@ -17,7 +17,7 @@ FREERTOS.BinarySemaphores01=BtnSem,Static,BtControlBlock
 FREERTOS.FootprintOK=true
 FREERTOS.IPParameters=Tasks01,FootprintOK,Queues01,BinarySemaphores01,configUSE_NEWLIB_REENTRANT
 FREERTOS.Queues01=UARTQueue,10,QUEUE_t,0,Static,UARTQueueBuffer,UARTQueueControlBlock
-FREERTOS.Tasks01=defaultTask,24,128,StartDefaultTask,Default,NULL,Static,defaultTaskBuffer,defaultTaskControlBlock;myLED1Task,8,128,StartLED1Task,Default,NULL,Static,myLED1TaskBuffer,myLED1TaskControlBlock;myLED2Task,8,128,StartLED2Task,Default,NULL,Static,myLED2TaskBuffer,myLED2TaskControlBlock;myReadBtnTask,8,128,StartReadBtnTask,Default,NULL,Static,myReadBtnBuffer,myReadBtnControlBlock;myLED3Task,8,128,StartLED3Task,Default,NULL,Static,myLED3TaskBuffer,myLED3TaskControlBlock;myADCTask,8,128,StartADCTask,Default,NULL,Static,myTask06Buffer,myTask06ControlBlock;myUARTTask,8,128,StartUARTTask,Default,NULL,Static,myUARTTaskBuffer,myUARTTaskControlBlock
+FREERTOS.Tasks01=defaultTask,24,128,StartDefaultTask,Default,NULL,Static,defaultTaskBuffer,defaultTaskControlBlock;myLED1Task,8,128,StartLED1Task,Default,NULL,Static,myLED1TaskBuffer,myLED1TaskControlBlock;myLED2Task,8,128,StartLED2Task,Default,NULL,Static,myLED2TaskBuffer,myLED2TaskControlBlock;myReadBtnTask,8,128,StartReadBtnTask,Default,NULL,Static,myReadBtnBuffer,myReadBtnControlBlock;myLED3Task,8,128,StartLED3Task,Default,NULL,Static,myLED3TaskBuffer,myLED3TaskControlBlock;myADCTask,8,128,StartADCTask,Default,NULL,Static,myADCTaskBuffer,myADCTaskControlBlock;myUARTTask,8,128,StartUARTTask,Default,NULL,Static,myUARTTaskBuffer,myUARTTaskControlBlock
 FREERTOS.configUSE_NEWLIB_REENTRANT=1
 File.Version=6
 GPIO.groupedBy=Group By Peripherals

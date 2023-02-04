@@ -113,14 +113,14 @@ const osThreadAttr_t myLED3Task_attributes = {
 };
 /* Definitions for myADCTask */
 osThreadId_t myADCTaskHandle;
-uint32_t myTask06Buffer[ 128 ];
-osStaticThreadDef_t myTask06ControlBlock;
+uint32_t myADCTaskBuffer[ 128 ];
+osStaticThreadDef_t myADCTaskControlBlock;
 const osThreadAttr_t myADCTask_attributes = {
   .name = "myADCTask",
-  .cb_mem = &myTask06ControlBlock,
-  .cb_size = sizeof(myTask06ControlBlock),
-  .stack_mem = &myTask06Buffer[0],
-  .stack_size = sizeof(myTask06Buffer),
+  .cb_mem = &myADCTaskControlBlock,
+  .cb_size = sizeof(myADCTaskControlBlock),
+  .stack_mem = &myADCTaskBuffer[0],
+  .stack_size = sizeof(myADCTaskBuffer),
   .priority = (osPriority_t) osPriorityLow,
 };
 /* Definitions for myUARTTask */
@@ -213,7 +213,7 @@ int main(void)
   MX_USART1_UART_Init();
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
-  HAL_ADC_Start(&hadc1);
+  //HAL_ADC_Start(&hadc1);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
   /* USER CODE END 2 */
 
@@ -226,7 +226,7 @@ int main(void)
 
   /* Create the semaphores(s) */
   /* creation of BtnSem */
-  BtnSemHandle = osSemaphoreNew(1, 1, &BtnSem_attributes);
+  BtnSemHandle = osSemaphoreNew(1, 0, &BtnSem_attributes);
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
@@ -358,7 +358,7 @@ static void MX_ADC1_Init(void)
   hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV6;
   hadc1.Init.Resolution = ADC_RESOLUTION_12B;
   hadc1.Init.ScanConvMode = DISABLE;
-  hadc1.Init.ContinuousConvMode = DISABLE;
+  hadc1.Init.ContinuousConvMode = ENABLE;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
@@ -531,10 +531,13 @@ void StartDefaultTask(void *argument)
 void StartLED1Task(void *argument)
 {
   /* USER CODE BEGIN StartLED1Task */
+	QUEUE_t msg;
   /* Infinite loop */
   for(;;)
   {
 	HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
+	strcpy(msg.Buf,"LED1 Blink\r\n");
+	osMessageQueuePut(UARTQueueHandle, &msg, 0, osWaitForever);
 	osDelay(1000);
   }
   /* USER CODE END StartLED1Task */
@@ -555,7 +558,7 @@ void StartLED2Task(void *argument)
   for(;;)
   {
 	HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
-	strcpy(msg.Buf,"LED2 Blink\r\n\0");
+	strcpy(msg.Buf,"LED2 Blink\r\n");
 	osMessageQueuePut(UARTQueueHandle, &msg, 0, osWaitForever);
 	osDelay(2000);
   }
@@ -579,7 +582,7 @@ void StartReadBtnTask(void *argument)
 	if (!HAL_GPIO_ReadPin(Btn_GPIO_Port, Btn_Pin))
 	{
 		osSemaphoreRelease(BtnSemHandle);
-		strcpy(msg.Buf,"Btn Pressed\r\n\0");
+		strcpy(msg.Buf,"Btn Pressed\r\n");
 		osMessageQueuePut(UARTQueueHandle, &msg, 0, osWaitForever);
 	}
 	osDelay(200);
@@ -623,22 +626,22 @@ void StartADCTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	  HAL_ADC_PollForConversion(&hadc1,100);
+	  HAL_ADC_Start(&hadc1);
 	  uint16_t adc_res = HAL_ADC_GetValue(&hadc1);
 	  __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_4,adc_res);
 	  if (adc_res < 10)
 	  {
-	    strcpy(msg.Buf,"MIN ADC\r\n\0");
+	    strcpy(msg.Buf,"MIN ADC\r\n");
 	    osMessageQueuePut(UARTQueueHandle, &msg, 0, osWaitForever);
-	    osDelay(1000);
+	    osDelay(100);
 	  }
 	  else if (adc_res > 4000)
 	  {
-	    strcpy(msg.Buf,"MAX ADC\r\n\0");
+	    strcpy(msg.Buf,"MAX ADC\r\n");
 	    osMessageQueuePut(UARTQueueHandle, &msg, 0, osWaitForever);
-	    osDelay(1000);
+	    osDelay(100);
 	  }
-	  osDelay(100);
+	  osDelay(10);
   }
   /* USER CODE END StartADCTask */
 }
